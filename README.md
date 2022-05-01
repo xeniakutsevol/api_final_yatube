@@ -7,7 +7,7 @@ git clone https://github.com/xeniakutsevol/api_final_yatube
 ```
 
 ```
-cd kittygram
+cd api_final_yatube
 ```
 
 Cоздать и активировать виртуальное окружение:
@@ -46,5 +46,4 @@ python3 manage.py runserver
 
 ```
 http://127.0.0.1:8000/redoc/
-
-
+```
