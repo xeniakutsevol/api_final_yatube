@@ -1,11 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, filters, status
+from rest_framework import viewsets, permissions, filters, mixins
 
 from posts.models import Post, Group
 from .serializers import (PostSerializer, GroupSerializer, CommentSerializer,
                           FollowSerializer)
 from .permissions import IsAuthorOrReadOnlyPermission
-from rest_framework.response import Response
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -37,7 +36,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=post)
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class CreateListViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                        viewsets.GenericViewSet):
+    pass
+
+
+class FollowViewSet(CreateListViewSet):
     serializer_class = FollowSerializer
     permission_classes = (IsAuthorOrReadOnlyPermission,
                           permissions.IsAuthenticated)
@@ -49,7 +53,4 @@ class FollowViewSet(viewsets.ModelViewSet):
         return user.follower.all()
 
     def perform_create(self, serializer):
-        if serializer.is_valid():
-            serializer.save(user=self.request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save(user=self.request.user)
